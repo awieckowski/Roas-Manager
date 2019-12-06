@@ -1,0 +1,201 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Jekyll v3.8.5">
+    <title>{% block title %}{% endblock title %}</title>
+
+    <link rel=icon href={% static 'img/favicon.ico' %}>
+    <!-- Bootstrap -->
+    {#<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">#}
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap-datepicker3.standalone.min.css' %}">
+
+    <style>
+        .bd-placeholder-img {
+            font-size: 1.125rem;
+            text-anchor: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        @media (min-width: 768px) {
+            .bd-placeholder-img-lg {
+                font-size: 3.5rem;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+</head>
+<body>
+<nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
+    <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="{% url 'overview' %}">ROAS Manager</a>
+    <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
+    <ul class="navbar-nav px-3">
+        <li class="nav-item text-nowrap">
+            <a class="nav-link" href="{% url 'logout' %}" id="user_logged" data-user="{{ request.user.id }}">Wyloguj</a>
+        </li>
+    </ul>
+</nav>
+
+<div class="container-fluid">
+    <div class="row">
+        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+            <div class="sidebar-sticky">
+
+                <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                    <span>ROAS Manager</span>
+                    <a class="d-flex align-items-center text-muted" href="#">
+                        <span data-feather="plus-circle"></span>
+                    </a>
+                </h6>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'overview' %}">
+                            <span data-feather="minimize"></span>
+                            Podsumowanie dzienne
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'strategies' %}">
+                            <span data-feather="trending-up"></span>
+                            Strategie
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'campaigns' %}">
+                            <span data-feather="bar-chart-2"></span>
+                            Kampanie
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'accounts' %}">
+                            <span data-feather="database"></span>
+                            Konta i grupy kampanii
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'verify_budget' %}">
+                            <span data-feather="dollar-sign"></span>
+                            Weryfikacja budżetów
+                            {% if not unverified_budgets_number == 0 %}
+                                <span class="badge badge-warning">{{ unverified_budgets_number }}</span>
+                            {% endif %}
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'get_report' %}">
+                            <span data-feather="download"></span>
+                            Uzupełnij dane
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'set_strategy_roas' %}">
+                            <span data-feather="play"></span>
+                            Aktualizuj tROAS w strategiach
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'set_campaign_roas' %}">
+                            <span data-feather="skip-forward"></span>
+                            Aktualizuj tROAS w kampaniach
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'alerts' %}">
+                            <span data-feather="bell"></span>
+                            Powiadomienia
+                            {% if not alerts_number == 0 %}
+                                <span class="badge badge-danger">{{ alerts_number }}</span>
+                            {% endif %}
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'settings' %}">
+                            <span data-feather="settings"></span>
+                            Ustawienia
+                        </a>
+                    </li>
+                </ul>
+
+                <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                    <span>Uzupełnij sufiksy adresu końcowego</span>
+                    <a class="d-flex align-items-center text-muted" href="#">
+                        <span data-feather="plus-circle"></span>
+                    </a>
+                </h6>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'update_suffix' %}">
+                            <span data-feather="layers"></span>
+                            Dodawanie sufiksów
+                        </a>
+                    </li>
+                </ul>
+
+                <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                    <span>Raporty Google Sheets</span>
+                    <a class="d-flex align-items-center text-muted" href="#">
+                        <span data-feather="plus-circle"></span>
+                    </a>
+                </h6>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'custom_cg_report' %}">
+                            <span data-feather="grid"></span>
+                            Raport grup kampanii
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+            <div class="row">
+                <div class="col-sm"></div>
+                <div class="col-sm"></div>
+                <div class="col-sm"></div>
+            </div>
+
+            <!-- //--------------------------- page content -------------------------// -->
+            {% block content %}{% endblock content %}
+            <!-- //--------------------------- page content end ---------------------// -->
+
+        </main>
+    </div>
+</div>
+
+{#    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>#}
+{#<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>#}
+{#    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>#}
+{#    <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.9.0/feather.min.js"></script>#}
+{#    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>#}
+<script src="{% static 'js/popper.min.js' %}"></script>
+<script src="{% static 'js/jquery-3.4.1.js' %}"></script>
+<script src="{% static 'js/bootstrap.min.js' %}"></script>
+<script src="{% static 'js/feather.min.js' %}"></script>
+<script src="{% static 'js/dashboard.js' %}"></script>
+<script src="{% static 'js/scripts.js' %}"></script>
+
+{% block switch_ajax %}{% endblock switch_ajax %}
+{% block switch_campaigns_ajax %}{% endblock switch_campaigns_ajax %}
+{% block save_campaign_group_ajax %}{% endblock save_campaign_group_ajax %}
+{% block save_strategy_ajax %}{% endblock save_strategy_ajax %}
+{% block save_campaign_ajax %}{% endblock save_campaign_ajax %}
+{% block hide_checkboxes_js %}{% endblock hide_checkboxes_js %}
+{% block verify_budget %}{% endblock verify_budget %}
+{% block date_picker_range %}{% endblock date_picker_range %}
+{% block date_picker %}{% endblock date_picker %}
+{% block filter_alerts %}{% endblock filter_alerts %}
+
+</body>
+</html>

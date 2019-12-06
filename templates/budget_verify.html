@@ -1,0 +1,62 @@
+{% extends "__base__.html" %}
+{% load static %}
+{% block title %}ROAS Manager | Zweryfikuj budżet{% endblock %}
+{% block content %}
+
+
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1>Budżety do zweryfikowania</h1>
+    </div>
+
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'strategies' %}">Strona główna</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Weryfikacja budżetów</li>
+        </ol>
+    </nav>
+
+    {% if budgets %}
+
+                <div class="table-responsive">
+        <table class="table table-striped table-sm table-bordered">
+            <tr>
+                <th>Konto</th>
+                <th>Grupa kampanii</th>
+                <th>Właściciel</th>
+                <th>Bieżący budżet</th>
+                <th>Okres bieżącego budżetu</th>
+                <th>Zatwierdzanie</th>
+
+            </tr>
+            {% for budget in budgets %}
+                <tr>
+                    <td>{{ budget.campaign_group.account.account_name }}</td>
+                    <td>{{ budget.campaign_group.name }}</td>
+                    <td>{% for user in budget.user.all %} {{ user.username }} {% endfor %} </td>
+                    <td class="currency">{{ budget.to_spend }}</td>
+                    <td>{{ budget.date_from }} - {{ budget.date_to }}</td>
+                    <td>
+                        <select class="browser-default custom-select-sm verify-budget" data-budgetId="{{ budget.id }}">
+                            <option value="1" selected>Wybierz</option>
+                            <option value="2">Zatwierdzony</option>
+                            <option value="3">Do poprawy</option>
+                            <option value="1">Niezweryfikowany</option>
+                        </select>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+                </div>
+                <input type="submit" class="btn btn-primary" id="save" value="Zapisz">
+
+    {% else %}
+
+        <p>Brak budżetów wymagających zatwierdzenia.</p>
+
+    {% endif %}
+
+{% endblock content %}
+
+{% block verify_budget %}
+        <script src="{% static 'js/verify_budget.js' %}"></script>
+{% endblock verify_budget %}

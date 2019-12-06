@@ -1,0 +1,102 @@
+{% extends "__base__.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+<div class="container-fluid">
+
+{% block title %}ROAS Manager | Utwórz raport dla grupy kampanii{% endblock %}
+    {% block content %}
+
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1>Utwórz raport dla grup kampanii w Google Sheets</h1>
+        </div>
+
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'strategies' %}">Strona główna</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Raport grup kampanii</li>
+            </ol>
+        </nav>
+
+
+        {% if success %}
+
+            Dane zostały wyeksportowane <a href="https://docs.google.com/spreadsheets/d/{{ sheet }}/edit#gid=0">do arkusza</a>.<br />
+            <a href="{% url 'custom_cg_report' %}">Powrót</a>
+
+        {% else %}
+
+            <div class="row">
+                <div class="col-sm">
+                    <form action="#" method="post">
+
+                        <div class="form-group">
+                            <label>
+                                Eksportowane dane
+                            </label>
+
+                            <div class="form-check">
+                                <label for="cost">
+                                    <input type="checkbox" name="report_type" value="cost" class="form-check-input">
+                                    Koszty i kliki
+                                </label>
+                            </div>
+
+                            <div class="form-check">
+                                <label for="income">
+                                    <input type="checkbox" name="report_type" value="income" class="form-check-input">
+                                    GMV, przychód, transakcje
+                                </label>
+                            </div>
+                        </div>
+
+                        <p>Dane transakcyjne będą pobrane tylko dla <a href="{% url 'accounts' %}">grup kampanii</a> z uzupełnioną kwerendą SQL BigQuery.</p>
+
+                        <div class="form-group">
+                            {{ form.account|as_crispy_field }}
+                        </div>
+
+                        <div class="form-group-1">
+                            <label>
+                                {{ form.campaign_group.label }}
+                            </label>
+
+                            {% for cg in campaign_groups %}
+                                <div class="form-check hiding" data-account_id="{{ cg.account.id }}" style="display: none">
+                                    <label for="{{ cg.id }}">
+                                        <input type="checkbox" name="campaign_group" value="{{ cg.id }}" class="form-check-input">
+                                        {{ cg.name }}
+                                    </label>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="form-group">
+                            {{ form.date_from|as_crispy_field }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.date_to|as_crispy_field }}
+                        </div>
+
+                        <input type="submit" class="btn btn-primary" value="Pobierz">
+                        {% csrf_token %}
+                    </form>
+                </div>
+                <div class="col-sm">
+                </div>
+                <div class="col-sm">
+                </div>
+            </div>
+
+        {% endif %}
+        </div>
+    {% endblock %}
+
+{% block hide_checkboxes_js %}
+    <script src="{% static 'js/hide_checkboxes.js' %}"></script>
+{% endblock hide_checkboxes_js %}
+{% block date_picker_range %}
+    <script src="{% static 'js/bootstrap-datepicker.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap-datepicker.pl.min.js' %}"></script>
+    <script src="{% static 'js/date_picker_range.js' %}"></script>
+{% endblock date_picker_range %}

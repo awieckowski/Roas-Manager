@@ -1,0 +1,108 @@
+{% extends "__base__.html" %}
+{% load static %}
+{% block title %}ROAS Manager | Strategie{% endblock %}
+{% block content %}
+
+
+
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1>Strategie</h1>
+
+
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="btn-group mr-2">
+                <button role="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span data-feather="calendar"></span>
+                    {% if not date %}
+                        {{ yesterday }}
+                    {% else %}
+                        {{ date }}
+                    {% endif %}
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuLink" id="date"></div>
+                <form style="display: none" method="post" action="#" id="switch-budget">
+                    {% csrf_token %}
+                    <input type="text" name="date_from" class="form-control dateinput form-control" id="budget_date">
+                    <input type="submit" value="przełącz budżet">
+                </form>
+            </div>
+            <div class="btn-group mr-2">
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="user-items">Moje strategie</button>
+            </div>
+            <div class="btn-group mr-2">
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="all-items">Wszystkie strategie</button>
+            </div>
+            <div class="btn-group mr-2">
+                <a href="{% url 'add_strategy' %}">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="all-items">
+                        <span data-feather="plus-circle"></span>
+                        Dodaj strategię
+                    </button>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'strategies' %}">Strona główna</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Strategie</li>
+        </ol>
+    </nav>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-sm table-bordered">
+            <tr>
+                <th>Nazwa</th>
+                <th>Konto</th>
+                <th>Grupa kampanii</th>
+                <th>Bieżący budżet</th>
+                <th>Okres bieżącego budżetu</th>
+                <th style="width: 7%">Regulacja</th>
+
+            </tr>
+            {% for strategy_budget in strategy_budgets %}
+                <tr class="dynamic-row" data-user={% for user in strategy_budget.0.user.all %}{{ user.id }},{% endfor %}>
+                    <td><a href="{% url 'log' strategy_budget.0.id %}">{{ strategy_budget.0.name }}</a></td>
+                    <td>{{ strategy_budget.0.account }}</td>
+                    {% if strategy_budget.0.campaign_group %}
+                        <td><a href="{% url 'edit_campaign_group' strategy_budget.0.campaign_group.id %}">{{ strategy_budget.0.campaign_group }}</a></td>
+                    {% else %}
+                        <td style="color: darkred"><b>Brak</b> | <a href="{% url 'strategy' strategy_budget.0.id %}">przypisz</a></td>
+                    {% endif %}
+                    {% if strategy_budget.1 %}
+                        <td class="currency"><a href="{% url 'edit_budget' strategy_budget.0.campaign_group.id strategy_budget.1.id %}">{{ strategy_budget.1.to_spend }}</a></td>
+                        <td>{{ strategy_budget.1.date_from|date:"d-m-Y" }} - {{ strategy_budget.1.date_to|date:"d-m-Y" }}</td>
+                    {% else %}
+                        {% if strategy_budget.0.campaign_group %}
+                            <td style="color: darkred"><b>Brak</b> | <a href="{% url 'add_budget' strategy_budget.0.campaign_group.id %}">dodaj</a></td>
+                        {% else %}
+                            <td style="color: darkred">--</td>
+                        {% endif %}
+                        <td style="color: darkred">--</td>
+                    {% endif %}
+                    <td style="text-align: center;">
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox" name="make_changes" class="custom-control-input ajax-switch" required id="{{strategy_budget.0.id}}" {% if strategy_budget.2 %}checked{% endif %}>
+                            <label for="{{strategy_budget.0.id}}" class="custom-control-label"></label>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <a class="align-items-center" href="{% url 'add_strategy' %}"><span data-feather="plus-circle"></span>  Dodaj strategię</a>
+
+{% endblock content %}
+
+{% block switch_ajax %}
+    <script src="{% static 'js/strategy_switch_ajax.js' %}"></script>
+    <script src="{% static 'js/filter_rows.js' %}"></script>
+{% endblock switch_ajax %}
+
+{% block date_picker %}
+    <script src="{% static 'js/bootstrap-datepicker.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap-datepicker.pl.min.js' %}"></script>
+    <script src="{% static 'js/log_switch_budget.js' %}"></script>
+
+{% endblock date_picker %}

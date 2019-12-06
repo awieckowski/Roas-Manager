@@ -1,0 +1,77 @@
+{% extends "__base__.html" %}
+{% load static %}
+{% block title %}ROAS Manager | Kampanie{% endblock %}
+{% block content %}
+
+
+
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1>Kampanie</h1>
+
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="btn-group mr-2">
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="user-items">Moje kampanie</button>
+            </div>
+            <div class="btn-group mr-2">
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="all-items">Wszystkie kampanie</button>
+            </div>
+            <div class="btn-group mr-2">
+                <a href="{% url 'add_campaign' %}">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="all-items">
+                        <span data-feather="plus-circle"></span>
+                        Dodaj kampanię
+                    </button>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'strategies' %}">Strona główna</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Kampanie</li>
+        </ol>
+    </nav>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-sm table-bordered table-hover">
+            <tr>
+                <th>Nazwa</th>
+                <th>Konto</th>
+                <th>Strategia źródłowa</th>
+                <th>Mnożnik ROAS</th>
+                <th style="width: 7%">Regulacja</th>
+
+            </tr>
+            {% for row in campaigns_table %}
+                <tr class="dynamic-row" data-user={% for user in row.0.user.all %}{{ user.id }},{% endfor %}>
+                    <td><a href="{% url 'campaign' row.0.id %}">{{ row.0.name }}</a></td>
+                    <td>{{ row.1 }}</td>
+                    {% if row.2 %}
+                        <td><a href="{% url 'campaign' row.0.id %}">{{ row.2.name }}</a></td>
+                    {% else %}
+                        <td style="color: darkred"><b>Brak</b> | <a href="{% url 'campaign' row.0.id %}">przypisz</a></td>
+                    {% endif %}
+                    {% if row.3 %}
+                        <td>{{ row.3 }}</td>
+                    {% else %}
+                        <td style="color: darkred"><b>Brak</b> | <a href="{% url 'campaign' row.0.id %}">ustaw</a></td>
+                    {% endif %}
+                    <td style="text-align: center;">
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox" name="make_changes" class="custom-control-input ajax-switch" required id="{{ row.0.id }}" {% if row.4 %}checked{% endif %}>
+                            <label for="{{ row.0.id }}" class="custom-control-label"></label>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <a class="align-items-center" href="{% url 'add_campaign' %}"><span data-feather="plus-circle"></span>  Dodaj kampanie</a>
+
+{% endblock content %}
+
+{% block switch_campaigns_ajax %}
+    <script src="{% static 'js/campaign_switch_ajax.js' %}"></script>
+    <script src="{% static 'js/filter_rows.js' %}"></script>
+{% endblock switch_campaigns_ajax %}

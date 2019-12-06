@@ -1,0 +1,310 @@
+{% extends "__base__.html" %}
+{% load template_maths %}
+{% block title %}ROAS Manager | Wyniki strategii{% endblock %}
+{% load static %}
+{% block content %}
+
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1>
+            <div class="btn-toolbar mb-2 mb-md-0">
+                <div class="btn-group mr-2">
+                    <span>{{ strategy.name }}</span>
+                </div>
+            </div>
+        </h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+
+            <div class="btn-group mr-2">
+                <button role="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span data-feather="trending-up"></span>
+                    Moje strategie
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                    {% for user_strategy in user_strategies %}
+                        <a class="dropdown-item" href="{% url 'log' user_strategy.id %}">{{ user_strategy.name }}</a>
+                    {% endfor %}
+                </div>
+                <form style="display: none" method="post" action="#" id="switch-budget">
+                    {% csrf_token %}
+                    <input type="text" name="date_from" class="form-control dateinput form-control" id="budget_date">
+                    <input type="submit" value="przełącz budżet">
+                </form>
+            </div>
+
+            <div class="btn-group mr-2">
+                <button role="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span data-feather="calendar"></span>
+                    {% if not date and budget %}
+                        Bieżący budżet
+                    {% elif date and budget %}
+                        {{ budget.date_from }} - {{ budget.date_to }}
+                    {% elif date %}
+                        {{ date }}
+                    {% endif %}
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuLink" id="date"></div>
+            </div>
+            {% if not date %}
+                <div class="btn-group mr-2">
+                    <a href="https://docs.google.com/spreadsheets/d/{{ sheet_id}}/edit#gid={{ campaign_group.sheet_id }}" target="_blank"><button type="button" class="btn btn-sm btn-outline-secondary">Google Sheets</button></a>
+                </div>
+            {% endif %}
+            <div class="btn-group mr-2">
+                <span><a class="btn btn-primary btn-sm" href="{% url 'strategy' strategy.id %}" role="button">Edytuj</a></span>
+            </div>
+
+        </div>
+    </div>
+
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'strategies' %}">Strona główna</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'strategies' %}">Strategie</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ strategy.name }}</li>
+        </ol>
+    </nav>
+
+    {% if campaign_group %}
+
+        {% if budget %}
+
+            {% if table and not date %}
+
+                {% if not yesterday_row.2 < 0 %}
+                    {% if last_day_off_target_percent <= 40 or last_day_off_target_percent >= 180 %}
+                        <div class="alert alert-danger" role="alert">
+                            <p>Wczorajszy koszt stanowił <b>{{ last_day_off_target_percent }}%</b> kwoty zaplanowanej na ten dzień (<b>{{ yesterday_row.6 }}</b> zł z planowych <b>{{ yesterday_row.5 }}</b> zł). Różnica to <b>{{ last_day_off_target }}</b> zł.</p>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="alert alert-danger" role="alert">
+                        <p>Budżet dla tej grupy kampanii został przekroczony o <b>{{ yesterday_row.2|multiply:-1 }} zł</b>!</p>
+                    </div>
+                {% endif %}
+
+                <div class="card-group my-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Początek okresu budżetowego:</h5>
+                            <p class="card-text">{{ budget.date_from }}</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Koniec okresu budżetowego</h5>
+                            <p class="card-text">{{ budget.date_to }}</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Przypisana grupa kampanii:</h5>
+                            <a class="card-text" href="{% url 'edit_campaign_group' campaign_group.id %}">{{ campaign_group.name }} ({{ campaign_group.account.account_name }})</a>
+                        </div>
+                    </div>
+                </div>
+
+                {% if not date %}
+
+                    <div class="row">
+                        <div class="col-sm">
+                            <div class="card-group border-secondary mb-1">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>Wczorajszy koszt</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        {% if yesterday_row %}
+                                            <p class="card-text currency">{{ yesterday_row.6 }}</p>
+                                        {% else %}
+                                            <p class="card-text">Brak danych za wczoraj</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="card ">
+                                    <div class="card-header">
+                                        <h5>Koszt docelowy</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        {% if yesterday_row %}
+                                            <p class="card-text currency">{{ yesterday_row.5 }}</p>
+                                        {% else %}
+                                            <p class="card-text">Brak danych za wczoraj</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm">
+                            <div class="card-group border-secondary mb-1">
+
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>ROAS przed</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        {% if yesterday_row.7 and not yesterday_row.7 == '--' %}
+                                            <p class="card-text">{{ yesterday_row.7 }}</p>
+                                        {% else %}
+                                            <p class="card-text">Brak danych za wczoraj</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>ROAS po</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        {% if yesterday_row.8 and not yesterday_row.8 == '--' %}
+                                            <p class="card-text">{{ yesterday_row.8 }}</p>
+                                        {% else %}
+                                            <p class="card-text">Brak danych za wczoraj</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm">
+                            <div class="card-group border-secondary mb-1">
+
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>Budżet bazowy</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        {% if yesterday_row %}
+                                            <p class="card-text currency">{{ budget.to_spend }}</p>
+                                        {% else %}
+                                            <p class="card-text">Brak danych za wczoraj</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>Pozostały budżet</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        {% if yesterday_row %}
+                                            <p class="card-text currency">{{ yesterday_row.2 }}</p>
+                                        {% else %}
+                                            <p class="card-text">Brak danych za wczoraj</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                {% endif %}
+
+                <div class="table-responsive my-4 tableFixHead">
+                <table class="table table-striped table-bordered table-hover table-sm">
+                    <tr>
+                        <th>Data</th>
+                        <th>Łączny koszt</th>
+                        <th>Pozostałe środki</th>
+                        <th>% wydany / % docelowy</th>
+                        <th>Docelowe wydatki</th>
+                        <th>Koszt</th>
+                        <th>ROAS przed zmianą</th>
+                        <th>ROAS po zmianie</th>
+                        <th>Obrót</th>
+                        <th>Przychód netto</th>
+                        <th>ROI</th>
+                    </tr>
+                    {% for row in table %}
+                        <tr>
+                            <td>{{ row.0 }}</td>
+                            <td class="currency">{{ row.1 }}</td>
+                            <td class="currency">{{ row.2 }}</td>
+                            <td>{{ row.3|multiply:100|floatformat:2 }} / {{ row.4|multiply:100|floatformat:2 }} %</td>
+                            <td class="currency">{{ row.5 }}</td>
+                            <td class="currency">{{ row.6 }}</td>
+                            <td>{{ row.7 }}</td>
+                            <td>{{ row.8 }}</td>
+                            <td class="currency">{{ row.9 }}</td>
+                            <td class="currency">{{ row.10 }}</td>
+                            <td>{{ row.11 }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% elif table and date %}
+
+                <div class="table-responsive my-4">
+                    <table class="table table-striped table-bordered table-hover table-sm">
+                        <tr>
+                            <th>Data</th>
+                            <th>Łączny koszt</th>
+                            <th>Pozostałe środki</th>
+                            <th>% wydanego budżetu / % docelowy</th>
+                            <th>Docelowe wydatki na kolejny dzień</th>
+                            <th>Koszt</th>
+                            <th>ROAS przed zmianą</th>
+                            <th>ROAS po zmianie</th>
+                            <th>GMV incl. refunds</th>
+                            <th>Income netto</th>
+                            <th>ROI</th>
+                        </tr>
+                        {% for row in table %}
+                            <tr>
+                                <td>{{ row.0 }}</td>
+                                <td class="currency">{{ row.1 }}</td>
+                                <td class="currency">{{ row.2 }}</td>
+                                <td>{{ row.3|multiply:100|floatformat:2 }}% / {{ row.4|multiply:100|floatformat:2 }}%</td>
+                                <td class="currency">{{ row.5 }}</td>
+                                <td class="currency">{{ row.6 }}</td>
+                                <td>{{ row.7 }}</td>
+                                <td>{{ row.8 }}</td>
+                                <td class="currency">{{ row.9 }}</td>
+                                <td class="currency">{{ row.10 }}</td>
+                                <td>{{ row.11 }}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+
+            {% else %}
+
+                <h3>Brak wyników w tym zakresie dat</h3>
+                <p>Dla tej strategii nie ma danych o koszcie w bieżącym okresie budżetowym.</p>
+                <p>Możesz je pobrać i uzupełnić <a href="{% url 'get_report' %}">tutaj</a>.</p>
+            {% endif %}
+
+        {% elif date %}
+
+            <h3>Brak budżetu obejmującego wybrany dzień ({{ date }})</h3>
+            <p>Wybierz datę z zakresu dowolnego budżetu dodanego do tej strategii lub <a href="{% url 'add_budget' strategy.campaign_group.id %}">dodaj nowy budżet</a>.</p>
+
+        {% else %}
+
+            <h3>Brak bieżących budżetów dodanych do tej strategii</h3>
+            <p>Żadnen z budżetów dodanych do tej strategii nie obejmuje wczorajszego dnia.</p>
+            <div class="row mt-4">
+                <div class="col-sm">
+                    <a class="align-items-center" href="{% url 'add_budget' strategy.campaign_group.id %}"><span data-feather="plus-circle"></span>  Dodaj budżet</a>
+                </div>
+            </div>
+
+        {% endif %}
+
+    {% else %}
+
+        <h3>Strategia nie została jeszcze przypisana do żadnej grupy kampanii</h3>
+        <p>Aby włączyć zarządzanie ROAS, przypisz strategię do wybranej grupy kampanii.</p>
+        <p>Możesz to zrobić <a href="{% url 'strategy' strategy.id %}">tutaj</a>, jeżeli grupy kampanii były już pobrane do ROAS Managera.
+            W przeciwnym razie najpierw <a href="{% url 'add_campaign_group' %}">dodaj nowe grupy kampanii</a>.</p>
+
+    {% endif %}
+
+<div class="row mt-4">
+</div>
+
+<a href="{% url 'strategies' %}"><span data-feather="corner-up-left"></span> Powrót do listy strategii</a>
+</div>
+{% endblock %}
+{% block date_picker %}
+    <script src="{% static 'js/bootstrap-datepicker.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap-datepicker.pl.min.js' %}"></script>
+    <script src="{% static 'js/log_switch_budget.js' %}"></script>
+{% endblock date_picker %}

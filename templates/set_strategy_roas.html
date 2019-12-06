@@ -1,0 +1,72 @@
+{% extends "__base__.html" %}
+{% load static %}
+<div class="container-fluid">
+{% block title %}ROAS Manager | Aktualizuj tROAS w wybranych strategiach{% endblock %}
+    {% block content %}
+
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1>Aktualizuj tROAS w wybranych strategiach</h1>
+        </div>
+
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'strategies' %}">Strona główna</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Aktualizuj tROAS w strategiach</li>
+            </ol>
+        </nav>
+
+        {% if result %}
+            <p>{{ result }}</p>
+            <a href="{% url 'set_strategy_roas' %}">Powrót</a>
+
+        {% else %}
+
+                <p>ROAS zostanie zaktualizowany we wszystkich strategiach przypisanych do zaznaczonych grup kampanii.<br />
+                    Indywidualne strategie muszą mieć włączoną regulację budżetu, aby zmiany zostały zapisane na koncie.</p>
+                <div class="row">
+                    <div class="col-sm">
+
+                        <form action="#" method="post">
+                            <div class="form-group">
+                                <label>
+                                    {{ form.account.label }}
+                                </label>
+                                {{ form.account }}
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    {{ form.campaign_group.label }}
+                                </label>
+                                {% for cg in campaign_groups %}
+                                    <div class="form-check hiding" data-account_id="{{ cg.account.id }}" style="display: none">
+                                             <label for="{{ cg.id }}">
+                                            <input type="checkbox" name="campaign_group" value="{{ cg.id }}" class="form-check-input">
+                                            {{ cg.name }}
+                                        </label>
+                                    </div>
+                                {% endfor %}
+
+                            </div>
+                            <div class="form-group">
+                                <p>Dodatkowe opcje:</p>
+                                <label>
+                                    {{ form.override_check }}
+                                    {{ form.override_check.label }}
+                                </label>
+                            </div>
+                            <input type="submit" class="btn btn-primary" value="Aktualizuj">
+                            {% csrf_token %}
+                        </form>
+                    </div>
+                    <div class="col-sm">
+                    </div>
+                    <div class="col-sm">
+                    </div>
+                </div>
+        {% endif %}
+    {% endblock %}
+</div>
+
+{% block hide_checkboxes_js %}
+    <script src="{% static 'js/hide_checkboxes.js' %}"></script>
+{% endblock hide_checkboxes_js %}

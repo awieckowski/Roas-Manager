@@ -1,0 +1,80 @@
+{% extends "__base__.html" %}
+{% load static %}
+{% block title %}ROAS Manager | Dodaj strategię{% endblock %}
+{% block content %}
+
+
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1>Dodaj nową strategię do ROAS Managera</h1>
+    </div>
+
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'strategies' %}">Strona główna</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'strategies' %}">Strategie</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Dodaj strategię</li>
+        </ol>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <p>Pobierz strategię z konta. Po pobraniu możliwy będzie ich wybór i dodanie do ROAS Managera.<br />
+               Pamiętaj, aby po dodaniu strategii przypisać każdą z nich do właściwej grupy kampanii.</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm">
+            <form action="#" method="post">
+                <div class="form-group">
+                    <label>
+                        {{form.account.label }}
+                    </label>
+                    {{ form.account }}
+                </div>
+                <input type="submit" class="btn btn-primary" value="Pobierz">
+                {% csrf_token %}
+            </form>
+        </div>
+        <div class="col-sm"></div>
+        <div class="col-sm"></div>
+    </div>
+    <div class="row">
+    </div>
+    <div class="row">
+        <div class="col-sm">
+
+            {% if strategies %}
+
+                <p>Wybierz strategię i przypisz jej grupę kampanii</p>
+
+                <form action="#" method="post" id="strategy_select">
+                    <input type="hidden" name="account_no" value="{{ account.id }}" id="account_id">
+                    <div class="form-group">
+                        {% for strategy, data in strategies.items %}
+                            <div class="form-check">
+                                {% if data.2 %}
+                                    <input class="form-check-input str" type="checkbox" name="strategy" value="{{ data.0 }}" id="{{ strategy }}">
+                                {% else %}
+                                    <input class="form-check-input str" type="checkbox" name="strategy" value="{{ data.0 }}" id="{{ strategy }}" disabled>
+                                {% endif %}
+                                <label class="form-check-label" for="{{ strategy }}">{{ strategy }}</label>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <input type="submit" class="btn btn-primary" value="Dodaj strategię" id="save-str">
+                    {% csrf_token %}
+                </form>
+
+            {% endif %}
+
+        </div>
+        <div class="col-sm"></div>
+        <div class="col-sm"></div>
+    </div>
+
+{% endblock %}
+
+{% block save_strategy_ajax %}
+        <script src="{% static 'js/save_strategies.js' %}"></script>
+{% endblock save_strategy_ajax %}

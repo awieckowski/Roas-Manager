@@ -1,0 +1,58 @@
+{% extends "__base__.html" %}
+{% block title %}{% endblock %}
+{% block content %}
+    {% load crispy_forms_tags %}
+
+
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1>Ustawienia powiadomień</h1>
+    </div>
+
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'strategies' %}">Strona główna</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Powiadomienia</li>
+        </ol>
+    </nav>
+
+    <p>Warunki, przy których wysyłane będą powiadomienia mailowe (sprawdzane codziennie rano).</p>
+
+    <div class="row">
+        <div class="col-sm">
+
+            <form action="#" method="post">
+                <div class="form-group">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <input type="submit" class="btn btn-primary" value="Zapisz">
+                </div>
+            </form>
+        </div>
+        <div class="col-sm">
+        </div>
+        <div class="col-sm">
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-sm">
+            <p><b>Objaśnienia:</b></p>
+            <p><u>Zbyt małe / zbyt duże wydatki:</u></p>
+            <p>Liczba w ustawieniach to stosunek kosztu dziennego do docelowego kosztu dziennego. Przykład:</p>
+            <ul>
+                <li>Jeśli dzienny koszt docelowy to <b>1000 zł</b>, zaś alert zbyt małych wydatków ustawiony jest na <b>0.40</b>, powiadomienie będzie wysłane, jeśli koszt dzienny będzie mniejszy lub równy <b>400 zł.</b></li>
+                <li>Jeśli dzienny koszt docelowy to <b>1000 zł</b>, zaś alert zbyt dużych wydatków ustawiony jest na <b>1.80</b>, powiadomienie będzie wysłane, jeśli koszt dzienny będzie większy lub równy <b>1800 zł</b>.</li>
+            </ul>
+            <p><u>Minimalne ROI:</u></p>
+            <p>Próg ROI, poniżej którego wysłany będzie alert. Grupa kampanii musi mieć uzupełnioną kwerendę SQL.</p>
+            <p><u>Kampanie nie przypisane do grupy:</u></p>
+            <p>Wyślij powiadomienie, jeśli odnalezione będą kampanie, które nie zostały przypisane do żadnej grupy (taka sytuacja powoduje, że nie wszystkie koszty są zbierane przez ROAS Managera).</p>
+            <p><u>Przekroczenie budżetu:</u></p>
+            <p>Wyślij powiadomienie, jeśli dana grupa kampanii wyczerpie swój budżet</p>
+            <p><u>Brak budżetu na kolejny okres:</u></p>
+            <p>Wyślij powiadomienie, jeśli na X dni przed końcem okresu budżetowego nie będzie dodany budżet na kolejny okres (koszty grup kampanii bez budżetów nie są regulowane).</p>
+        </div>
+        <div class="col-sm">
+        </div>
+    </div>
+{% endblock %}

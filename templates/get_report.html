@@ -1,0 +1,181 @@
+{% extends "__base__.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+<div class="container-fluid">
+
+{% block title %}ROAS Manager | Pobierz i uzupełnij dane{% endblock %}
+    {% block content %}
+
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1>Uzupełnij dane</h1>
+        </div>
+
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'strategies' %}">Strona główna</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Uzupełnij dane</li>
+            </ol>
+        </nav>
+
+
+        {% if cost_results or income_results %}
+
+            {% if cost_results %}
+
+                <h3>Pobrane i zapisane dane - koszty i kliki</h3>
+
+
+                <div class="table-responsive my-4">
+                    <table class="table table-striped table-bordered table-sm">
+                        <tr>
+                            <th>Konto</th>
+                            <th>Grupa kampanii</th>
+                            <th>Data</th>
+                            <th>Koszt</th>
+                            <th>Kliknięcia</th>
+                        </tr>
+
+                        {% for campaign_group, data in cost_results.items %}
+                            {% for day in data %}
+                                <tr>
+                                    <td>{{ day.3 }}</td>
+                                    <td>{{ campaign_group }}</td>
+                                    <td>{{ day.0 }}</td>
+                                    <td class="currency">{{ day.1 }}</td>
+                                    <td>{{ day.2 }}</td>
+                                </tr>
+                            {% endfor %}
+                        {% endfor %}
+
+                    </table>
+                </div>
+
+            {% endif %}
+            {% if income_results %}
+
+                <h3>Pobrane i zapisane dane - przychód i transakcje</h3>
+
+                <div class="table-responsive my-4">
+                    <table class="table table-striped table-bordered table-sm">
+                        <tr>
+                            <th>Grupa kampanii</th>
+                            <th>Data</th>
+                            <th>Transakcje</th>
+                            <th>GMV</th>
+                            <th>Przychód</th>
+                        </tr>
+
+                        {% for campaign_group, data in income_results.items %}
+                            {% for day in data %}
+                                <tr>
+                                    <td>{{ campaign_group }}</td>
+                                    <td>{{ day.0 }}</td>
+                                    <td>{{ day.1 }}</td>
+                                    <td class="currency">{{ day.2 }}</td>
+                                    <td class="currency">{{ day.3 }}</td>
+                                </tr>
+                            {% endfor %}
+                        {% endfor %}
+
+                    </table>
+                </div>
+            {% endif %}
+
+        {% elif report_types %}
+            {% if 'income' in report_types  %}
+                <p>Brak wyników dla GMV / przychodu - dane dla wybranego zakresu prawdopodobnie były już wcześniej zapisane.<br /><p>
+            {% endif %}
+            {% if 'cost' in report_types  %}
+                <p>Brak wyników dla kosztu i klików - dane dla wybranego zakresu prawdopodobnie były już wcześniej zapisane.<br /></p>
+            {% endif %}
+            <p>Jeżeli mimo to chcesz je pobrać ponownie, zaznacz opcję "nadpisz istniejące dane" przed ich pobraniem.</p>
+            <a href="{% url 'get_report' %}"><span data-feather="corner-up-left"></span> Powrót</a>
+
+        {% else %}
+            <div class="row">
+                <div class="col-sm">
+                    <form action="#" method="post">
+
+                        <div class="form-group">
+                            <label>
+                                Dane do aktualizacji
+                            </label>
+
+                            <div class="form-check">
+                                <label for="cost">
+                                    <input type="checkbox" name="report_type" value="cost" class="form-check-input">
+                                    Koszty i kliki
+                                </label>
+                            </div>
+
+                            <div class="form-check">
+                                <label for="income">
+                                    <input type="checkbox" name="report_type" value="income" class="form-check-input">
+                                    GMV, przychód, transakcje
+                                </label>
+                            </div>
+                        </div>
+
+                        <p>Dane transakcyjne będą pobrane tylko dla <a href="{% url 'accounts' %}">grup kampanii</a> z uzupełnioną kwerendą SQL BigQuery.</p>
+
+                        <div class="form-group">
+                            {{ form.account|as_crispy_field }}
+                        </div>
+
+                        <div class="form-group-1">
+                            <label>
+                                {{ form.campaign_group.label }}
+                            </label>
+
+                            {% for cg in campaign_groups %}
+                                <div class="form-check hiding" data-account_id="{{ cg.account.id }}" style="display: none">
+                                    <label for="{{ cg.id }}">
+                                        <input type="checkbox" name="campaign_group" value="{{ cg.id }}" class="form-check-input">
+                                        {{ cg.name }}
+                                    </label>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="form-group">
+                            {{ form.date_from|as_crispy_field }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.date_to|as_crispy_field }}
+                        </div>
+
+                        <div class="form-check">
+                            <label for="cost">
+                                <input type="checkbox" name="overwrite" value="overwrite" class="form-check-input">
+                                Nadpisz zapisane wcześniej dane
+                            </label>
+                        </div>
+
+                        <div class="form-check">
+                            <label for="cost">
+                                <input type="checkbox" name="google_sheets" value="export" class="form-check-input">
+                                Zaktualizuj arkusz Google Sheets
+                            </label>
+                        </div>
+                        <input type="submit" class="btn btn-primary" value="Pobierz">
+                        {% csrf_token %}
+                    </form>
+                </div>
+                <div class="col-sm">
+                </div>
+                <div class="col-sm">
+                </div>
+            </div>
+        {% endif %}
+        </div>
+    {% endblock %}
+
+{% block hide_checkboxes_js %}
+    <script src="{% static 'js/hide_checkboxes.js' %}"></script>
+{% endblock hide_checkboxes_js %}
+{% block date_picker_range %}
+    <script src="{% static 'js/bootstrap-datepicker.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap-datepicker.pl.min.js' %}"></script>
+    <script src="{% static 'js/date_picker_range.js' %}"></script>
+{% endblock date_picker_range %}

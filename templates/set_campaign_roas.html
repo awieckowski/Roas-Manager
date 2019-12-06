@@ -1,0 +1,91 @@
+{% extends "__base__.html" %}
+{% load static %}
+{% load template_maths %}
+<div class="container-fluid">
+{% block title %}ROAS Manager | Aktualizuj tROAS w wybranych kampaniach{% endblock %}
+    {% block content %}
+
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1>Aktualizuj tROAS w wybranych kampaniach</h1>
+        </div>
+
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'strategies' %}">Strona główna</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Aktualizuj tROAS w kampaniach</li>
+            </ol>
+        </nav>
+
+        {% if result %}
+            <div class="table-responsive my-4">
+                <table class="table table-striped table-bordered table-sm">
+                    <tr>
+                        <th>Kampania</th>
+                        <th>ROAS strategii źródłowej</th>
+                        <th>ROAS ustawiony w kampanii</th>
+                    </tr>
+
+                    {% for campaign, data in result.items %}
+                        <tr>
+                            <td>{{ campaign }}</td>
+                            <td>{{ data.0 }}</td>
+                            <td>{{ data.1 }}</td>
+                        </tr>
+                    {% endfor %}
+
+                </table>
+            </div>
+
+            <a href="{% url 'set_strategy_roas' %}">Powrót</a>
+
+        {% else %}
+
+                <p>ROAS zostanie zaktualizowany we wszystkich kampaniach o indywidualnym tROAS przypisanych do zaznaczonych strategii.<br />
+                    Poszczególne kampanie muszą mieć włączoną regulację budżetu, aby zmiany zostały zapisane na koncie.</p>
+                <div class="row">
+                    <div class="col-sm">
+
+                        <form action="#" method="post">
+                            <div class="form-group">
+                                <label>
+                                    {{ form.account.label }}
+                                </label>
+                                {{ form.account }}
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    {{ form.strategy.label }}
+                                </label>
+                                {% for strategy in strategies %}
+                                    <div class="form-check hiding" data-account_id="{{ strategy.account.id }}" style="display: none">
+                                             <label for="{{ strategy.id }}">
+                                            <input type="checkbox" name="strategy" value="{{ strategy.id }}" class="form-check-input">
+                                            {{ strategy.name }}
+                                        </label>
+                                    </div>
+                                {% endfor %}
+
+                            </div>
+                            <div class="form-group">
+                                <p>Dodatkowe opcje:</p>
+                                <label>
+                                    {{ form.override_check }}
+                                    {{ form.override_check.label }}
+                                </label>
+                            </div>
+                            <input type="submit" class="btn btn-primary" value="Aktualizuj">
+                            {% csrf_token %}
+                        </form>
+                    </div>
+                    <div class="col-sm">
+                    </div>
+                    <div class="col-sm">
+                    </div>
+                </div>
+        {% endif %}
+    {% endblock %}
+</div>
+
+{% block hide_checkboxes_js %}
+    <script src="{% static 'js/hide_checkboxes.js' %}"></script>
+{% endblock hide_checkboxes_js %}

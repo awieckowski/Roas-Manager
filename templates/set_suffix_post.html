@@ -1,0 +1,63 @@
+{% extends "__base__.html" %}
+{% block title %}ROAS Manager | Uzupełnij sufiksy końcowego adresu URL{% endblock %}
+{% block content %}
+
+
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1>Uzupełnij sufiksy końcowego adresu URL na kontach Google Ads</h1>
+    </div>
+
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'strategies' %}">Strona główna</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Dodawanie sufiksów</li>
+        </ol>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <div class="col-sm">
+
+            {% if results == 0 %}
+
+                <h3>Błąd API</h3>
+                <p>Wystąpił błąd, powiadom administratora.</p>
+
+            {% elif results %}
+
+                <h3>Sufiksy dodane</h3>
+                <p>Ilość zmodyfikowanych grup reklam na koncie {{ account.account_name }}: <b>{{ count }}</b></p>
+                <p>Lista zmodyfikowanych grup reklam:</p>
+
+                <div class="table-responsive my-4">
+                    <table class="table table-striped table-bordered table-sm">
+                        <tr>
+                            <th>Kampania</th>
+                            <th>Grupa reklam</th>
+                        </tr>
+
+                        {% for ad_group, campaign in results.items %}
+                                <tr>
+                                    <td>{{ campaign }}</td>
+                                    <td>{{ ad_group }}</td>
+                                </tr>
+                        {% endfor %}
+
+                    </table>
+                </div>
+
+
+            {% else %}
+
+                <h3>Nie odnalaziono grup reklam wymagających uzupełnienia</h3>
+                <p>Wszystkie grupy reklam na koncie <b>{{ account.account_name }}</b> miały już uzupełnione sufiksy.</p>
+
+            {% endif %}
+
+            <a href="{% url 'update_suffix' %}">Powrót</a>
+
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends "__base__.html" %}
+{% block title %}ROAS Manager | Dodaj kampanię{% endblock %}
+{% block content %}
+    {% load crispy_forms_tags %}
+    {% load static %}
+
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1>Dodaj kampanię Google Ads</h1>
+    </div>
+
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'strategies' %}">Strona główna</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'campaigns' %}">Kampanie</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Dodaj kampanię</li>
+        </ol>
+    </nav>
+
+    <p>Po wybraniu konta pobrane zostaną wszystkie kampanie bidujące w oparciu o ROAS, ale nieprzypisane do żadnej strategii.</p>
+
+    <div class="row">
+        <div class="col-sm">
+            <form action="#" method="post">
+                <div class="form-group">
+                    {% csrf_token %}
+                    {{ form.account|as_crispy_field}}
+                </div>
+                <div class="form-group">
+                    <input type="submit" class="btn btn-primary" value="Pobierz">
+                </div>
+            </form>
+        </div>
+        <div class="col-sm">
+        </div>
+        <div class="col-sm">
+        </div>
+
+    </div>
+
+
+    {% if campaigns %}
+        <div class="row">
+            <p>Wybierz kampanie do dodania:</p>
+        </div>
+        <div class="row">
+            <div class="col-sm">
+                <form action="#" method="post" id="campaign_select">
+                    <div class="form-group">
+                        <input type="hidden" name="account" value="{{ account_id }}" id="account_id">
+                        {% for campaign, campaign_data in campaigns.items %}
+
+                            <div class="form-check">
+                                <label for="{{ campaign }}">
+                                    {% if campaign_data.2 %}
+                                        <input type="checkbox" name="campaign" value="{{ campaign }}" class="form-check-input campaign" data-campaign_id="{{ campaign_data.0 }}" data-campaign_type="{{ campaign_data.1 }}" checked>
+                                    {% else %}
+                                        <input type="checkbox" name="campaign" value="{{ campaign }}" class="form-check-input campaign" data-campaign_id="{{ campaign_data.0 }}" data-campaign_type="{{ campaign_data.1 }}" disabled>
+                                    {% endif %}
+                                    {{ campaign }}
+                                </label>
+                            </div>
+
+                        {% endfor %}
+                    </div>
+                    <div class="form-group">
+                        <input type="submit" id="save-campaign" class="btn btn-primary" value="Zapisz">
+                    </div>
+                </form>
+            </div>
+            <div class="col-sm">
+            </div>
+            <div class="col-sm">
+            </div>
+        </div>
+    {% endif %}
+    <div class="col-sm">
+    </div>
+    <div class="col-sm">
+    </div>
+
+{% endblock %}
+
+{% block save_campaign_ajax %}
+    <script src="{% static 'js/save-campaign.js' %}"></script>
+{% endblock save_campaign_ajax %}

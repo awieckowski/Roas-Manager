@@ -1,0 +1,59 @@
+{% extends "__base__.html" %}
+{% block title %}{% endblock %}
+{% block content %}
+    {% load crispy_forms_tags %}
+
+
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1>Grupa kampanii {{ campaign_group.name }}</h1>
+    </div>
+
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'strategies' %}">Strona główna</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'accounts' %}">Konta i grupy kampanii</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ campaign_group.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-sm">
+            <h2>Edycja</h2>
+
+            <form action="#" method="post">
+                <div class="form-group">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <input type="submit" class="btn btn-primary" value="Zapisz">
+                </div>
+            </form>
+        </div>
+        <div class="col-sm">
+            <h2>Przypisane budżety</h2>
+
+            <div class="table-responsive">
+                <table class="table table-striped table-sm">
+                    <tr>
+                        <th>Budżet</th>
+                        <th>Początek</th>
+                        <th>Koniec</th>
+                        <th>Edycja</th>
+                    </tr>
+                    {% for budget in budgets %}
+                        <tr>
+                            <td class="currency">{{ budget.to_spend }}</td>
+                            <td>{{ budget.date_from|date:"d-m-Y" }}</td>
+                            <td>{{ budget.date_to|date:"d-m-Y" }}</td>
+                            <td><a href="{% url 'edit_budget' campaign_group.id budget.id%}">Edycja</a></td>
+                        </tr>
+                    {% endfor %}
+                </table>
+
+                <br />
+                <a class="align-items-center" href="{% url 'add_budget' campaign_group.id %}"><span data-feather="plus-circle"></span>  Dodaj budżet</a>
+            </div>
+
+        </div>
+    </div>
+
+{% endblock %}

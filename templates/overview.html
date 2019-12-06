@@ -1,0 +1,102 @@
+{% extends "__base__.html" %}
+{% load template_maths %}
+{% block title %}ROAS Manager | Podsumowanie wyników strategii{% endblock %}
+{% load static %}
+{% block content %}
+
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1>Podsumowanie wyników strategii</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="btn-group mr-2">
+                <button role="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span data-feather="calendar"></span>
+                    {% if not date %}
+                        {{ today }}
+                    {% elif date %}
+                        {{ date }}
+                    {% endif %}
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuLink" id="date"></div>
+            </div>
+            <div class="btn-group mr-2">
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="all-items">Wszystkie strategie</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="user-items">Moje strategie</button>
+            </div>
+            <form style="display: none" method="post" action="#" id="switch-budget">
+                {% csrf_token %}
+                <input type="text" name="date_from" class="form-control dateinput form-control" id="budget_date">
+                <input type="submit" value="przełącz budżet">
+            </form>
+        </div>
+    </div>
+
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'strategies' %}">Strona główna</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Podsumowanie dzienne</li>
+        </ol>
+    </nav>
+
+    <div class="table-responsive my-4">
+        <table class="table table-striped table-bordered table-hover table-sm">
+            <tr>
+                <th>Strategia</th>
+                <th>Konto</th>
+                <th>Łączny koszt</th>
+                <th>Pozostałe środki</th>
+                <th>% wydanego budżetu / % docelowy</th>
+                <th>Koszt docelowy</th>
+                <th>Koszt</th>
+                <th>ROAS przed zmianą</th>
+                <th>ROAS po zmianie</th>
+                <th>Obrót</th>
+                <th>Przychód netto</th>
+                <th>ROI</th>
+            </tr>
+            {% for row in table %}
+                <tr class="dynamic-row" data-user={% for user in row.0.user.all %}{{ user.id }},{% endfor %}>
+                    <td><a href="{% url 'log' row.0.id %}">{{ row.0.name }}</a></td>
+                    <td>{{ row.1 }}</td>
+                    {% if not row.2 %}
+                        <td colspan="11" align="center">brak budżetu przypisanego do nadrzędnej grupy kampanii na wybrany dzień</td>
+                    {% else %}
+                        {% if row.2 == '--' %}
+                            <td>--</td>
+                            <td>--</td>
+                            <td>--</td>
+                            <td>--</td>
+                            <td>--</td>
+                        {% else %}
+                            <td class="currency">{{ row.2|floatformat:2 }}</td>
+                            <td class="currency">{{ row.3|floatformat:2 }}</td>
+                            <td>{{ row.5|multiply:100|floatformat:2 }}% / {{ row.4|multiply:100|floatformat:2 }}%</td>
+                            <td class="currency">{{ row.6|floatformat:2 }}</td>
+                            <td class="currency">{{ row.7|floatformat:2 }}</td>
+                        {% endif %}
+                        {% if row.8 %}<td>{{ row.8 }}</td>{% else %}<td>--</td>{% endif %}
+                        {% if row.9 %}<td>{{ row.9 }}</td>{% else %}<td>--</td>{% endif %}
+                        {% if row.10 == '--' %}
+                            <td>--</td>
+                            <td>--</td>
+                            <td>--</td>
+                        {% else %}
+                            <td class="currency">{{ row.10|floatformat:2 }}</td>
+                            <td class="currency">{{ row.11|floatformat:2 }}</td>
+                            <td>{{ row.12 }}</td>
+                        {% endif %}
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        </table>
+
+        <div class="row mt-4">
+        </div>
+    </div>
+{% endblock %}
+{% block date_picker %}
+    <script src="{% static 'js/bootstrap-datepicker.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap-datepicker.pl.min.js' %}"></script>
+    <script src="{% static 'js/log_switch_budget.js' %}"></script>
+    <script src="{% static 'js/filter_strategies.js' %}"></script>
+
+{% endblock date_picker %}

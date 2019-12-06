@@ -1,0 +1,71 @@
+{% extends "__base__.html" %}
+{% block title %}ROAS Manager | Dodaj budżet{% endblock %}
+{% load static %}
+{% block content %}
+    {% load crispy_forms_tags %}
+
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1>Dodaj nowy budżet</h1>
+    </div>
+
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'strategies' %}">Strona główna</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'accounts' %}">Konta i grupy kampanii</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'edit_campaign_group' campaign_group.id  %}">{{ campaign_group.name }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Dodaj budżet</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-sm">
+
+
+
+            {% if strategies_count > 1 %}
+                <p>
+                    Budżet dodany do grupy kampanii <b>{{ campaign_group.name }}</b> będzie przypisany również do strategii należących do tej grupy:
+                </p>
+                <ul>
+                    {% for str in strategies %}
+                        <li>{{ str.name }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>
+                    Datę podaj w formacie RRRR-MM-DD (np. 2019-01-31)
+                </p>
+            {% endif %}
+
+            {% if error %}
+                <div class="alert alert-danger" role="alert">
+                    <p>{{ error }}</p>
+                </div>
+            {% endif %}
+            <form action="#" method="post">
+                <div class="form-group">
+                    {{ form.to_spend|as_crispy_field }}
+                    {{ form.date_from|as_crispy_field }}
+                    {{ form.date_to|as_crispy_field }}
+                    <label for="cg" class="col-form-label">
+                        Grupa kampanii:
+                    </label>
+                    <input type="text" name="campaign_group" value="{{ campaign_group.name }}" class="form-control" disabled id="cg">
+                </div>
+                <input type="submit" class="btn btn-primary" value="Zapisz">
+
+                {% csrf_token %}
+            </form>
+        </div>
+        <div class="col-sm">
+        </div>
+        <div class="col-sm">
+        </div>
+    </div>
+{% endblock %}
+
+{% block date_picker_range %}
+    <script src="{% static 'js/bootstrap-datepicker.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap-datepicker.pl.min.js' %}"></script>
+    <script src="{% static 'js/date_picker_range.js' %}"></script>
+{% endblock date_picker_range %}

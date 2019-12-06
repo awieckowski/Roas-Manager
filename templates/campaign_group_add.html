@@ -1,0 +1,82 @@
+{% extends "__base__.html" %}
+{% load static %}
+{% block title %}ROAS Manager | Dodaj grupę kampanii{% endblock %}
+{% block content %}
+    {% load crispy_forms_tags %}
+
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1>Dodaj grupę kampanii</h1>
+    </div>
+
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'strategies' %}">Strona główna</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'accounts' %}">Konta i grupy kampanii</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Dodaj grupę kampanii</li>
+        </ol>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <p>Pobierz grupy kampanii z konta. Po pobraniu możliwy będzie ich wybór i dodanie do ROAS Managera.</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm">
+            <form action="#" method="post">
+                <div class="form-group">
+                    {{ form.account|as_crispy_field }}
+                </div>
+                <input type="submit" class="btn btn-primary" value="Pobierz">
+                {% csrf_token %}
+            </form>
+        </div>
+        <div class="col-sm"></div>
+        <div class="col-sm"></div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm">
+
+            {% if campaign_groups %}
+
+                <p>Wybierz grupę kampanii do dodania:</p>
+
+                <form action="#" method="post">
+                    <input type="hidden" name="account" value="{{ account_id }}" id="account_id">
+                    <div class="form-group">
+                        {% for campaign_group, data in campaign_groups.items %}
+                            <div class="form-check">
+                            {% if data.2 %}
+                                <input class="form-check-input cg" type="checkbox" name="campaign_group" value="{{ data.0 }}" id="{{ campaign_group }}" disabled>
+                            {% else %}
+                                <input class="form-check-input cg" type="checkbox" name="campaign_group" value="{{ data.0 }}" id="{{ campaign_group }}" checked>
+                            {% endif %}
+                                <label class="form-check-label" for="{{ campaign_group }}">{{ campaign_group }}</label>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <input type="submit" class="btn btn-primary" value="Dodaj grupę kampanii" id="save-cg">
+
+                    {% csrf_token %}
+                </form>
+
+            {% endif %}
+            {% if duplicate %}
+                <p><b>{{ duplicate }}</b></p>
+            {% endif %}
+
+        </div>
+        <div class="col-sm"></div>
+        <div class="col-sm"></div>
+    </div>
+
+
+
+{% endblock content%}
+
+{% block save_campaign_group_ajax %}
+        <script src="{% static 'js/save_campaign_group_ajax.js' %}"></script>
+{% endblock save_campaign_group_ajax %}

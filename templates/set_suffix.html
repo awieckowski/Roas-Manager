@@ -1,0 +1,34 @@
+{% extends "__base__.html" %}
+{% block title %}ROAS Manager | Uzupełnij sufiksy końcowego adresu URL{% endblock %}
+{% block content %}
+{% load crispy_forms_tags %}
+
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1>Uzupełnij sufiksy końcowego adresu URL na kontach Google Ads</h1>
+    </div>
+
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'strategies' %}">Strona główna</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Dodawanie sufiksów</li>
+        </ol>
+    </nav>
+
+            <p>Sufiksy końcowego adresu URL uzupełniane są wyłącznie na poziomie grup reklam, gdzie ich brakuje.<br />
+                Aktualizacja starych sufiksów wymaga wcześniejszego ich skasowania.</p>
+
+        <div class="row">
+        <div class="col-sm">
+                <form action="#" method="post">
+                        {{ form.account|as_crispy_field }}
+                    <input type="submit" class="btn btn-primary" value="Uzupełnij">
+                    {% csrf_token %}
+                </form>
+        </div>
+        <div class="col-sm">
+        </div>
+        <div class="col-sm">
+        </div>
+        </div>
+
+{% endblock %}

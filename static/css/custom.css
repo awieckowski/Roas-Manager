@@ -1,0 +1,20 @@
+h1 {
+    font-size: 1.8em;
+}
+
+h2 {
+    font-size: 1.5em;
+    margin-bottom: 1.5em;
+}
+
+h3 {
+    font-size: 1.5em;
+    margin-bottom: 1.2em;
+}
+
+a.isDisabled {
+  color: currentColor;
+  cursor: not-allowed;
+  opacity: 0.5;
+  text-decoration: none;
+}
