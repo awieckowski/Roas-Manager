@@ -22,7 +22,7 @@ This is why I built ROAS Manager. Set how much you want to spend per campaign gr
 
 ## Libraries / frameworks
 
-* Django 2.24 with REST framework
+* Django 2 with REST framework
 * [Google Ads API](https://developers.google.com/google-ads/api/docs/start)
 * [Google Sheets API](https://developers.google.com/sheets/api)
 * [BigQuery API](https://cloud.google.com/bigquery/docs/reference/rest/)
