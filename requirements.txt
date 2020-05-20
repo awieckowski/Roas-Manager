@@ -24,7 +24,7 @@ google-cloud-core==1.0.3
 google-resumable-media==0.4.1
 googleads==21.0.0
 googleapis-common-protos==1.6.0
-httplib2==0.14.0
+httplib2==0.18.0
 idna==2.8
 isodate==0.6.0
 lxml==4.4.1
