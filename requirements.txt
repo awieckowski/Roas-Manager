@@ -6,7 +6,7 @@ cachetools==3.1.1
 certifi==2019.6.16
 chardet==3.0.4
 defusedxml==0.6.0
-Django==3.0
+Django==3.0.7
 django-annoying==0.10.5
 django-crispy-forms==1.8.1
 django-debug-toolbar==2.1
